@@ -354,7 +354,6 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     del = floor(p4[pole_poz[i]] / 5);
     pos = (int)del;
     pocetnost[pos] = pocetnost[pos] + 1;
-    // printf("%d\n",pocetnost[pos]);
   }
 
   // for (i = 0; i<vel_pol; i++){
