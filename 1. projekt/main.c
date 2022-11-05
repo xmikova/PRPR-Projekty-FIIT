@@ -4,32 +4,36 @@
 #include <string.h>
 #include <ctype.h>
 
-
 int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy) {
+      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+{
   unsigned long long int id, datum;
   char modul[10], typ[10], cas[10];
   double hodnota;
   char arr[255];
   char s;
 
-  if (*fr == NULL) {
+  if (*fr == NULL)
+  {
     *fr = fopen("dataloger.txt", "r");
-    printf("Otvoril som.");
   }
 
-  if (*fr == NULL) {
+  if (*fr == NULL)
+  {
     printf("Neotvoreny subor\n");
     return 0;
   }
 
   fseek(*fr, 0, SEEK_SET);
 
-  printf("%d %d %d %d %d %d\n", p1, *p2, *p3, p4, *p5, p6);
   if (p1 != NULL && *p2 != NULL && *p3 != NULL && p4 != NULL && *p5 != NULL &&
-      p6 != NULL) {
-    printf("testik");
-    for (int i = 0; i < *zaznamy; i++) {
+      p6 != NULL)
+  {
+    for (int i = 0; i < *zaznamy; i++)
+    {
+      if (p1[i] == '\0' && (*p2)[i] == NULL && (*p3)[i] == NULL && p4[i] == '\0' && (*p5)[i] == NULL && p6[i] == '\0'){
+        continue;
+      }
       printf("ID cislo mer. osoby: %llu\n", p1[i]);
       printf("Mer. modul: %s\n", (*p2)[i]);
       printf("Typ mer. veliciny: %s\n", (*p3)[i]);
@@ -38,9 +42,11 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
       printf("Datum: %llu\n", p6[i]);
       printf("\n");
     }
-  } else {
-    printf("test");
-    do {
+  }
+  else
+  {
+    do
+    {
       fscanf(*fr, "%llu \n %s \n %s \n %lf \n %s \n %llu \n", &id, modul, typ,
              &hodnota, cas, &datum);
       printf("ID cislo mer. osoby: %llu\n", id);
@@ -54,9 +60,61 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   }
 }
 
+int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
+                   double *p4, char ***p5, unsigned long long int *p6,
+                   unsigned int *zaznamy)
+{
+  int i;
+
+  free(p1);
+  p1 = NULL;
+
+  for (i = 0; i < *zaznamy; i++){
+    if ((*p2)[i] == NULL){
+        continue;
+    } else {
+    free((*p2)[i]);
+    (*p2)[i] = NULL;  
+    }
+  }
+  free(*p2);
+  *p2 = NULL;
+
+  for (i = 0; i < *zaznamy; i++) {
+    if ((*p3)[i] == NULL){
+        continue;
+    } else {
+    free((*p3)[i]);
+    (*p3)[i] = NULL;  
+    }
+  }
+  free(*p3);
+  *p3 = NULL;
+
+  free(p4);
+  p4 = NULL;
+
+  for (i = 0; i < *zaznamy; i++) {
+    if ((*p5)[i] == NULL){
+        continue;
+      }
+    free((*p5)[i]);
+    (*p5)[i] = NULL;
+  }
+  free(*p5);
+  *p5 = NULL;
+
+  free(p6);
+  p6 = NULL;
+
+  printf("%p %p %p %p %p %p", p1, *p2, *p3, p4, *p5, p6);
+  return 0;
+}
+
 int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
       double **p4, char ***p5, unsigned long long int **p6,
-      unsigned int *zaznamy) {
+      unsigned int *zaznamy)
+{
   int cntr = 0;
   unsigned long long int id, datum;
   char modul[10], typ[10], cas[10];
@@ -64,18 +122,26 @@ int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
   char arr[255];
   char s;
 
-  if (*fr != NULL) {
+  if (*fr != NULL)
+  {
     fseek(*fr, 0, SEEK_SET);
-  } else {
+  }
+  else
+  {
     printf("Neotvoreny subor.\n");
     return 0;
   }
-
+  if (p1 != NULL && *p2 != NULL && *p3 != NULL && p4 != NULL && *p5 != NULL &&
+      p6 != NULL){
+    dealokuj_polia(*p1, p2, p3, *p4, p5, *p6, zaznamy);
+      }
   //*fr = fopen("dataloger.txt", "r");
   while ((s = fscanf(*fr, "%s", arr)) !=
-         EOF) { // skenuje bez prazdnych riadkov teda priamo dostanem len pocet
-                // riadkov so zaznamami
-    if (s != '\n') {
+         EOF)
+  { // skenuje bez prazdnych riadkov teda priamo dostanem len pocet
+    // riadkov so zaznamami
+    if (s != '\n')
+    {
       cntr++;
     }
   }
@@ -83,14 +149,12 @@ int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
 
   *zaznamy = cntr / 6; // pocet zaznamov, kazdy zaznam pozostava zo 6 udajov
 
-  *p1 = (unsigned long long int *)malloc(*zaznamy *
-                                         sizeof(unsigned long long int));
+  *p1 = (unsigned long long int *)malloc(*zaznamy * sizeof(unsigned long long int));
   *p2 = malloc(*zaznamy * sizeof(char *));
   *p3 = malloc(*zaznamy * sizeof(char *));
   *p4 = (double *)malloc(*zaznamy * sizeof(double));
   *p5 = malloc(*zaznamy * sizeof(char *));
-  *p6 = (unsigned long long int *)malloc(*zaznamy *
-                                         sizeof(unsigned long long int));
+  *p6 = (unsigned long long int *)malloc(*zaznamy *  sizeof(unsigned long long int));
 
   fseek(*fr, 0, SEEK_SET);
   rewind(*fr);
@@ -100,7 +164,8 @@ int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
   printf("%d %d %d %d %d %d\n", *p1, *p2, *p3, *p4, *p5, *p6);
 
   int i = 0;
-  do {
+  do
+  {
     fscanf(*fr, "%llu \n %s \n %s \n %lf \n %s \n %llu \n", &id, modul, typ,
            &hodnota, cas, &datum);
     (*p1)[i] = id;
@@ -121,81 +186,54 @@ int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
   return 0;
 }
 
-int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
-                   double *p4, char ***p5, unsigned long long int *p6,
-                   unsigned int *zaznamy) {
-  int i;
-
-  free(p1);
-  p1 = NULL;
-
-  for (i = 0; i < *zaznamy; i++) {
-    free((*p2)[i]);
-    (*p2)[i] = NULL;
-  }
-  free(*p2);
-  *p2 = NULL;
-
-  for (i = 0; i < *zaznamy; i++) {
-    free((*p3)[i]);
-    (*p3)[i] = NULL;
-  }
-  free(*p3);
-  *p3 = NULL;
-
-  free(p4);
-  p4 = NULL;
-
-  for (i = 0; i < *zaznamy; i++) {
-    free((*p5)[i]);
-    (*p5)[i] = NULL;
-  }
-  free(*p5);
-  *p5 = NULL;
-
-  free(p6);
-  p6 = NULL;
-
-  printf("%p %p %p %p %p %p", p1, *p2, *p3, p4, *p5, p6);
-  return 0;
-}
 
 int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy) {
+      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+{
   char mm[10], tmr[10];
   int pole_poz[57];
   int pom = 0, j = 0, i = 0, cntr = 0;
 
-  if (*fr == NULL) {
+  if (*fr == NULL)
+  {
     printf("Neotvoreny subor.\n");
     return 0;
   }
 
   if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL) {
+      p6 == NULL)
+  {
     n(fr, &p1, p2, p3, &p4, p5, &p6, zaznamy);
     scanf("%s %s", mm, tmr);
     printf("%s %s", mm, tmr);
 
     for (i = 0; i < *zaznamy; i++) {
-      if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0) {
-        pole_poz[j] = i;
-        j++;
-        cntr++;
+      if (p1[i] == '\0' && (*p2)[i] == NULL && (*p3)[i] == NULL && p4[i] == '\0' && (*p5)[i] == NULL && p6[i] == '\0'){
+        continue;
+      } else{
+        if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0){
+          pole_poz[j] = i;
+          j++;
+          cntr++;
+        }  
       }
     }
 
-    for (i = 0; i < cntr; i++) {
+    for (i = 0; i < cntr; i++)
+    {
       printf("%d ", pole_poz[i]);
     }
     printf("\n");
 
-    for (i = 0; i < cntr - 1; i++) {
-      for (j = 0; j < cntr - i - 1; j++) {
+    for (i = 0; i < cntr - 1; i++)
+    {
+      for (j = 0; j < cntr - i - 1; j++)
+      {
         if (((p6[pole_poz[j]] > p6[pole_poz[j + 1]]) &&
              (atoi((*p5)[pole_poz[j]]) <= atoi((*p5)[pole_poz[j + 1]]))) ||
             ((p6[pole_poz[j]] == p6[pole_poz[j + 1]]) &&
-             (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]])))) {
+             (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]]))))
+        {
           pom = pole_poz[j + 1];
           pole_poz[j + 1] = pole_poz[j];
           pole_poz[j] = pom;
@@ -203,36 +241,46 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
       }
     }
 
-    for (i = 0; i < cntr; i++) {
-      printf("%s\t%s\t%llu\t%s\t%lf\n", (*p2)[pole_poz[i]], (*p3)[pole_poz[i]],
+    for (i = 0; i < cntr; i++)
+    {
+      printf("%s\t%s\t%llu\t%s\t%f\n", (*p2)[pole_poz[i]], (*p3)[pole_poz[i]],
              p6[pole_poz[i]], (*p5)[pole_poz[i]], p4[pole_poz[i]]);
     }
     printf("\n");
     dealokuj_polia(p1, p2, p3, p4, p5, p6, zaznamy);
-
-  } else {
+  }
+  else
+  {
     scanf("%s %s", mm, tmr);
     printf("%s %s", mm, tmr);
 
     for (i = 0; i < *zaznamy; i++) {
-      if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0) {
-        pole_poz[j] = i;
-        j++;
-        cntr++;
+      if (p1[i] == '\0' && (*p2)[i] == NULL && (*p3)[i] == NULL && p4[i] == '\0' && (*p5)[i] == NULL && p6[i] == '\0'){
+        continue;
+      } else{
+        if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0){
+          pole_poz[j] = i;
+          j++;
+          cntr++;
+        }  
       }
     }
 
-    for (i = 0; i < cntr; i++) {
+    for (i = 0; i < cntr; i++)
+    {
       printf("%d ", pole_poz[i]);
     }
     printf("\n");
 
-    for (i = 0; i < cntr - 1; i++) {
-      for (j = 0; j < cntr - i - 1; j++) {
+    for (i = 0; i < cntr - 1; i++)
+    {
+      for (j = 0; j < cntr - i - 1; j++)
+      {
         if (((p6[pole_poz[j]] > p6[pole_poz[j + 1]]) &&
              (atoi((*p5)[pole_poz[j]]) <= atoi((*p5)[pole_poz[j + 1]]))) ||
             ((p6[pole_poz[j]] == p6[pole_poz[j + 1]]) &&
-             (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]])))) {
+             (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]]))))
+        {
           pom = pole_poz[j + 1];
           pole_poz[j + 1] = pole_poz[j];
           pole_poz[j] = pom;
@@ -240,7 +288,8 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
       }
     }
 
-    for (i = 0; i < cntr; i++) {
+    for (i = 0; i < cntr; i++)
+    {
       printf("%s\t%s\t%llu\t%s\t%lf\n", (*p2)[pole_poz[i]], (*p3)[pole_poz[i]],
              p6[pole_poz[i]], (*p5)[pole_poz[i]], p4[pole_poz[i]]);
     }
@@ -249,26 +298,35 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 }
 
 int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy) {
+      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+{
   int i, j;
   char **pole_casy;
   char hod[3], min[3], last_hod[3], last_min[3], pom[5];
 
   if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL) {
+      p6 == NULL)
+  {
     printf("Polia nie su vytvorene.\n");
     return 0;
   }
   pole_casy = malloc((*zaznamy) * sizeof(char *));
 
-  for (i = 0; i < *zaznamy; i++) {
+  for (i = 0; i < *zaznamy; i++){
+    if (p1[i] == '\0' && (*p2)[i] == NULL && (*p3)[i] == NULL && p4[i] == '\0' && (*p5)[i] == NULL && p6[i] == '\0'){
+        continue;
+    }else{
     pole_casy[i] = malloc(5 * sizeof(char));
-    strcpy(pole_casy[i], (*p5)[i]);
+    strcpy(pole_casy[i], (*p5)[i]);  
+    }
   }
 
-  for (i = 0; i < *zaznamy - 1; i++) {
-    for (j = 0; j < *zaznamy - i - 1; j++) {
-      if (atoi(pole_casy[j]) > atoi(pole_casy[j + 1])) {
+  for (i = 0; i < *zaznamy - 1; i++)
+  {
+    for (j = 0; j < *zaznamy - i - 1; j++)
+    {
+      if (atoi(pole_casy[j]) > atoi(pole_casy[j + 1]))
+      {
         strcpy(pom, pole_casy[j + 1]);
         strcpy(pole_casy[j + 1], pole_casy[j]);
         strcpy(pole_casy[j], pom);
@@ -276,25 +334,35 @@ int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     }
   }
 
-  for (i = 0; i < *zaznamy; i++) {
+  for (i = 0; i < *zaznamy; i++)
+  {
     memcpy(hod, pole_casy[i], 2);
     strcpy(min, &pole_casy[i][2]);
 
-    if (i == 0) {
+    if (i == 0)
+    {
       printf("%s:", hod);
       strcpy(last_hod, hod);
       printf("%s", min);
       strcpy(last_min, min);
-    } else {
-      if (atoi(hod) > atoi(last_hod)) {
+    }
+    else
+    {
+      if (atoi(hod) > atoi(last_hod))
+      {
         printf("\n%s:", hod);
         strcpy(last_hod, hod);
         printf("%s", min);
         strcpy(last_min, min);
-      } else {
-        if ((atoi(hod) == atoi(last_hod)) && (atoi(min) == atoi(last_min))) {
+      }
+      else
+      {
+        if ((atoi(hod) == atoi(last_hod)) && (atoi(min) == atoi(last_min)))
+        {
           continue;
-        } else {
+        }
+        else
+        {
           printf(", %s", min);
           strcpy(last_min, min);
         }
@@ -305,15 +373,17 @@ int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 }
 
 int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy) {
+      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+{
   char tmv[10];
   int i = 0, j = 0, cntr = 0, pom = 0, cntr_hist = 0, min = 0, max = 5,
       vel_pol = 0, pos = 0;
-  int pole_poz[57], *pocetnost;
+  int pole_poz[10000], *pocetnost;
   double del;
 
   if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL) {
+      p6 == NULL)
+  {
     printf("Polia nie su vytvorene.\n");
     return 0;
   }
@@ -321,16 +391,25 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   scanf("%s", tmv);
 
   for (i = 0; i < *zaznamy; i++) {
-    if (strcmp(((*p3)[i]), tmv) == 0) {
+    if (p1[i] == '\0' && (*p2)[i] == NULL && (*p3)[i] == NULL && p4[i] == '\0' && (*p5)[i] == NULL && p6[i] == '\0'){
+        continue;
+    }else{
+    if (strcmp(((*p3)[i]), tmv) == 0)
+    {
       pole_poz[j] = i;
       j++;
       cntr++;
+    }  
     }
   }
+  printf("%d",cntr);
 
-  for (i = 0; i < cntr - 1; i++) {
-    for (j = 0; j < cntr - i - 1; j++) {
-      if (p4[pole_poz[j]] > p4[pole_poz[j + 1]]) {
+  for (i = 0; i < cntr - 1; i++)
+  {
+    for (j = 0; j < cntr - i - 1; j++)
+    {
+      if (p4[pole_poz[j]] > p4[pole_poz[j + 1]])
+      {
         pom = pole_poz[j + 1];
         pole_poz[j + 1] = pole_poz[j];
         pole_poz[j] = pom;
@@ -338,19 +417,18 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     }
   }
 
-  for (i = 0; i < cntr; i++) {
-    printf("%lf\n", p4[pole_poz[i]]);
-  }
 
   vel_pol = ceil((p4[pole_poz[cntr - 1]]) / 5);
   printf("%d\n", vel_pol);
 
   pocetnost = (int *)malloc(vel_pol * sizeof(int));
-  for (i = 0; i < vel_pol; i++) {
+  for (i = 0; i < vel_pol; i++)
+  {
     pocetnost[i] = 0;
   }
 
-  for (i = 0; i < cntr; i++) {
+  for (i = 0; i < cntr; i++)
+  {
     del = floor(p4[pole_poz[i]] / 5);
     pos = (int)del;
     pocetnost[pos] = pocetnost[pos] + 1;
@@ -360,8 +438,10 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   //   printf("%d", pocetnost[i]);
   //   }
 
-  for (i = 0; i < vel_pol; i++) {
-    if (pocetnost[i] > 0) {
+  for (i = 0; i < vel_pol; i++)
+  {
+    if (pocetnost[i] > 0)
+    {
       printf("%d-%d: %d\n", min, max, pocetnost[i]);
     }
     min = max;
@@ -370,7 +450,8 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 }
 
 int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy) {
+      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+{
   FILE *fw;
   char mm[10], tmr[10];
   int pole_poz[57];
@@ -380,31 +461,42 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   fw = fopen("vystup_S.txt", "w");
 
   if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL) {
+      p6 == NULL)
+  {
     printf("Polia nie su vytvorene.\n");
     return 0;
   }
 
   scanf("%s %s", mm, tmr);
 
-  for (i = 0; i < *zaznamy; i++) {
-    if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0) {
+  for (i = 0; i < *zaznamy; i++){
+    if (p1[i] == '\0' && (*p2)[i] == NULL && (*p3)[i] == NULL && p4[i] == '\0' && (*p5)[i] == NULL && p6[i] == '\0'){
+        continue;
+    }else{
+     if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0)
+    {
       pole_poz[j] = i;
       j++;
       cntr++;
+    } 
     }
+    
   }
 
-  if (cntr == 0) {
+  if (cntr == 0)
+  {
     printf("Pre dany vstup neexistuju zaznamy.");
   }
 
-  for (i = 0; i < cntr - 1; i++) {
-    for (j = 0; j < cntr - i - 1; j++) {
+  for (i = 0; i < cntr - 1; i++)
+  {
+    for (j = 0; j < cntr - i - 1; j++)
+    {
       if (((p6[pole_poz[j]] > p6[pole_poz[j + 1]]) &&
            (atoi((*p5)[pole_poz[j]]) <= atoi((*p5)[pole_poz[j + 1]]))) ||
           ((p6[pole_poz[j]] == p6[pole_poz[j + 1]]) &&
-           (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]])))) {
+           (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]]))))
+      {
         pom = pole_poz[j + 1];
         pole_poz[j + 1] = pole_poz[j];
         pole_poz[j] = pom;
@@ -413,15 +505,20 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   }
 
   merania = (double *)malloc(cntr * sizeof(double));
-  for (i = 0; i < cntr; i++) {
+  for (i = 0; i < cntr; i++)
+  {
     merania[i] = p4[pole_poz[i]];
   }
 
-  for (i = 0; i <= cntr; i++) {
-    if (i == cntr) {
+  for (i = 0; i <= cntr; i++)
+  {
+    if (i == cntr)
+    {
       printf("Pre dany vstup je vytvoreny txt subor.\n");
       fclose(fw);
-    } else {
+    }
+    else
+    {
       fprintf(fw, "%llu%s\t%.7lf\n", p6[pole_poz[i]], (*p5)[pole_poz[i]],
               merania[i]);
     }
@@ -429,44 +526,156 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   return 0;
 }
 
-int c(FILE **fr){
-  unsigned long long int id, datum;
-  char modul[10], typ[10], cas[10];
+int c(FILE **fr)
+{
+  char id[100], modul[10], typ[10], cas[10], hodnota_str[100], hod[3], min[3], datum[10], den[3], mesiac[3];
+  char *koniec;
   double hodnota;
-  char arr[255];
-  char s;
-  int i = 0;
+  int i = 0, spravnost = 0;
+  char tmr[9][3] = {"R1", "U1", "A1", "R2", "U2", "A2", "R4", "U4", "A4"};
+  char mesiace31[7][3] = {"01", "03", "05", "07", "08", "10", "12"};
+  char mesiace30[4][3] = {"04", "06", "09", "11"};
+  char arr[256];
 
-
-  if (*fr != NULL) {
+  if (*fr != NULL)
+  {
     fseek(*fr, 0, SEEK_SET);
-  } else {
+  }
+  else
+  {
     printf("Neotvoreny subor.\n");
     return 0;
   }
 
-  
-  printf("test");
- do {
-        fscanf(*fr, "%llu \n %s \n %s \n %lf \n %s \n %llu \n", &id, modul, typ, &hodnota, cas, &datum);
-        if ((id % 11 != 0) || (floor(log10(id) + 1) != 10)){
-          printf("Nekorektne zadany vstup: ID cislo mer. osoby.");
-        }
-        printf("Mer. modul: %s\n", modul);
-        if (isupper(modul[0]) == 0 || isdigit(modul[1]) == 0 || isdigit(modul[2]) == 0 || strlen(modul) != 3){
-          printf("Nekorektne zadany vstup: Mer. modul.");
-        }
-        printf("Typ mer. veliciny: %s\n", typ);
-        printf("Hodnota: %lf\n", hodnota);
-        printf("Cas merania: %s\n", cas);
-        printf("Datum: %llu\n", datum);
-        printf("\n");
-    } while (!feof(*fr));
+  do
+  {
+    int cntr1 = 0, cntr2 = 0;
+    fscanf(*fr, "%s \n %s \n %s \n %s \n %s \n %s \n ", id, modul, typ, hodnota_str, cas, datum);
+      if (((atoll(id)) % 11 != 0) || strlen(id) != 10)
+    {
+      printf("%d ",(atol(id)) % 11);
+      printf("   %lu",(atol(id)));
+      printf("   %s",id);
+      printf("Nekorektne zadany vstup: ID cislo mer. osoby.\n");
+      spravnost++;
+    }
+    if (isupper(modul[0]) == 0 || isdigit(modul[1]) == 0 || isdigit(modul[2]) == 0 || strlen(modul) != 3)
+    {
+      printf("Nekorektne zadany vstup: Mer. modul.\n");
+      spravnost++;
+    }
+    for (i = 0; i < 9; i++)
+    {
+      if (strcmp(tmr[i], typ) == 0)
+      {
+        cntr1++;
+      }
+    }
+    if (cntr1 == 0)
+    {
+      printf("Nekorektne zadany vstup: Typ mer. veliciny.\n");
+      spravnost++;
+    }
+    hodnota = strtod(hodnota_str, &koniec);
+    if ((*koniec == '\0') || (isspace(*koniec) != 0))
+    {
+      cntr2++;
+    }
+    if (cntr2 == 0)
+    {
+      printf("Nekorektne zadany vstup: Hodnota.\n");
+      spravnost++;
+    }
     
+    if (strlen(cas) != 4)
+    {
+      printf("Nekorektne zadany vstup: Cas.\n");
+      spravnost++;
+    }
+    else
+    {
+      strncpy(hod, cas, 2);
+      strcpy(min, &cas[2]);
+      if (atoi(hod) > 23 || atoi(min) > 59)
+      {
+        printf("Nekorektne zadany vstup: Cas.\n");
+        spravnost++;
+      }
+    }
+    
+    if (strlen(datum)!=8){
+      printf("Nekorektne zadany vstup: Cas.\n");
+      spravnost++;
+    } else{
+      strncpy(mesiac, &datum[4], 6-4);
+      mesiac[2] = '\0';
+      strncpy(den, datum + 6, 2);
+    } if (atoi(mesiac) > 12){
+      printf("Nekorektne zadany vstup: Cas.\n");
+      spravnost++;
+    } else{
+      for (i = 0; i < 7; i++){
+        if (strcmp(mesiace31[i], mesiac) == 0){
+          if (atoi(den) > 31){
+            printf("Nekorektne zadany vstup: Datum.\n");
+            spravnost++;
+          }
+        }
+      }
+      for (i = 0; i < 4; i++){
+        if (strcmp(mesiace30[i], mesiac) == 0){
+          if (atoi(den) > 30){
+            printf("Nekorektne zadany vstup: Datum.\n");
+            spravnost++;
+          }
+        }
+      }
+      if (atoi(mesiac) == 2){
+        if (atoi(den) > 28){
+          printf("Nekorektne zadany vstup: Datum.\n");
+          spravnost++;
+        }
+      }     
+    }
+  } while (!feof(*fr));
+
+  if (spravnost == 0){
+    printf("Data su korektne.\n");
+  }
+
   return 0;
 }
 
-int main() {
+int z(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
+      char ***p5, unsigned long long int *p6, unsigned int *zaznamy) {
+  int i, j = 0, cntr = 0;
+  unsigned long long int id;
+  char pole_poz[57];
+  scanf("%llu", &id);
+  for (i = 0; i < *zaznamy; i++) {
+    if (p1[i] == id) {
+      pole_poz[j] = i;
+      j++;
+      cntr++;
+    }
+  }
+  for (i=0; i < *zaznamy; i++){
+    for (j=0; j<cntr;j++){
+      if (i == pole_poz[j]){
+        p1[i] = '\0';
+        (*p2)[i] = NULL;
+        (*p3)[i] = NULL;
+        p4[i] = '\0';
+        (*p5)[i] = NULL;
+        p6[i] = '\0';
+      }
+    }
+  }
+  printf("vymazane: %d",cntr);
+}
+
+int main()
+{
   FILE *fr = NULL;
   unsigned long long int *p1 = NULL, *p6 = NULL;
   char **p2 = NULL, **p3 = NULL, **p5 = NULL;
@@ -474,9 +683,11 @@ int main() {
   unsigned int zaznamy;
   char pismeno;
 
-  do {
+  do
+  {
     scanf("%c", &pismeno);
-    switch (pismeno) {
+    switch (pismeno)
+    {
     case 'v':
       v(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
       break; // funkcia na vypis zaznamov
@@ -488,7 +699,6 @@ int main() {
       break; // funkcia na vytvorenie dinamickeho pola
     case 'h':
       h(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
-      ;
       break; // vypise spz specialnym sposobom
     case 's':
       s(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
@@ -496,18 +706,27 @@ int main() {
     case 'r':
       r(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
       break;
-    case 'c': 
-      c(&fr); 
+    case 'c':
+      c(&fr);
       break;
-      // case 'z': z(&SPZ); break;//vypise pocetnost znakov
-      // case 'k': z(&SPZ); break;//vypise pocetnost znakov
+    case 'z':
+      z(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
+      break;
     }
   } while (pismeno != 'k');
 
-  printf("%d", zaznamy);
-
+if (fr != NULL) {
+    fclose(fr);
+  }
   // TODO: dealokovat polia ak boli vytvorene a zavriet subor
-  fclose(fr);
+  // fclose(fr);
+
+  if (p1 != NULL && p2 != NULL && p3 != NULL && p4 != NULL && p5 != NULL &&
+      p6 != NULL) {
+    dealokuj_polia(p1, &p2, &p3, p4, &p5, p6, &zaznamy);
+  }
+
+
 
   return 0;
 }
