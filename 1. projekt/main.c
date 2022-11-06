@@ -4,14 +4,11 @@
 #include <string.h>
 #include <ctype.h>
 
-int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4, char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
 {
   unsigned long long int id, datum;
   char modul[10], typ[10], cas[10];
   double hodnota;
-  char arr[255];
-  char s;
 
   if (*fr == NULL)
   {
@@ -26,8 +23,7 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 
   fseek(*fr, 0, SEEK_SET);
 
-  if (p1 != NULL && *p2 != NULL && *p3 != NULL && p4 != NULL && *p5 != NULL &&
-      p6 != NULL) /*ak polia su uz alokovane, vypise z poli*/
+  if (p1 != NULL && *p2 != NULL && *p3 != NULL && p4 != NULL && *p5 != NULL && p6 != NULL) /*ak polia su uz alokovane, vypise z poli*/
   {
     for (int i = 0; i < *zaznamy; i++)
     {
@@ -50,8 +46,7 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   {
     do
     {
-      fscanf(*fr, "%llu \n %s \n %s \n %lf \n %s \n %llu \n", &id, modul, typ,
-             &hodnota, cas, &datum);
+      fscanf(*fr, "%llu \n %s \n %s \n %lf \n %s \n %llu \n", &id, modul, typ, &hodnota, cas, &datum);
       printf("ID cislo mer. osoby: %llu\n", id);
       printf("Mer. modul: %s\n", modul);
       printf("Typ mer. veliciny: %s\n", typ);
@@ -63,9 +58,8 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   }
 }
 
-int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
-                   double *p4, char ***p5, unsigned long long int *p6,
-                   unsigned int *zaznamy) /*funkcia pre dealokaciu poli, osetrene ak uz vo funkcii "z" niektore zaznamy boli prealokovane na NULL*/
+int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3, double *p4, char ***p5, unsigned long long int *p6,unsigned int *zaznamy) 
+/*funkcia pre dealokaciu poli, osetrene ak uz vo funkcii "z" niektore zaznamy boli prealokovane na NULL*/
 {
   int i;
 
@@ -123,16 +117,12 @@ int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
   return 0;
 }
 
-int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
-      double **p4, char ***p5, unsigned long long int **p6,
-      unsigned int *zaznamy)
+int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3, double **p4, char ***p5, unsigned long long int **p6, unsigned int *zaznamy)
 {
   int cntr = 0;
   unsigned long long int id, datum;
-  char modul[10], typ[10], cas[10];
+  char modul[10], typ[10], cas[10], arr[255], s;
   double hodnota;
-  char arr[255];
-  char s;
 
   if (*fr != NULL)
   {
@@ -143,8 +133,7 @@ int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
     printf("Neotvoreny subor.\n");
     return 0;
   }
-  if (p1 != NULL && *p2 != NULL && *p3 != NULL && p4 != NULL && *p5 != NULL &&
-      p6 != NULL)
+  if (p1 != NULL && *p2 != NULL && *p3 != NULL && p4 != NULL && *p5 != NULL && p6 != NULL)
   {
     dealokuj_polia(*p1, p2, p3, *p4, p5, *p6, zaznamy);
   }
@@ -187,12 +176,10 @@ int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
   return 0;
 }
 
-int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4, char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
 {
   char mm[100], tmr[100];
-  int pole_poz[57];
-  int pom = 0, j = 0, i = 0, cntr = 0;
+  int pole_poz[57], pom = 0, j = 0, i = 0, cntr = 0;
 
   if (*fr == NULL)
   {
@@ -200,8 +187,7 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     return 0;
   }
 
-  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL)
+  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL && p6 == NULL)
   {
     n(fr, &p1, p2, p3, &p4, p5, &p6, zaznamy); /*ak este neboli polia alokovane, alokujem si ich a na konci dealokujem, kedze "n" stlacene nebolo*/
     scanf("%s %s", mm, tmr);
@@ -242,8 +228,7 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 
     for (i = 0; i < cntr; i++)
     {
-      printf("%s\t%s\t%llu\t%s\t%f\n", (*p2)[pole_poz[i]], (*p3)[pole_poz[i]],
-             p6[pole_poz[i]], (*p5)[pole_poz[i]], p4[pole_poz[i]]);
+      printf("%s\t%s\t%llu\t%s\t%f\n", (*p2)[pole_poz[i]], (*p3)[pole_poz[i]], p6[pole_poz[i]], (*p5)[pole_poz[i]], p4[pole_poz[i]]);
     }
     dealokuj_polia(p1, p2, p3, p4, p5, p6, zaznamy);
   }
@@ -286,22 +271,18 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 
     for (i = 0; i < cntr; i++)
     {
-      printf("%s\t%s\t%llu\t%s\t%lf\n", (*p2)[pole_poz[i]], (*p3)[pole_poz[i]],
-             p6[pole_poz[i]], (*p5)[pole_poz[i]], p4[pole_poz[i]]);
+      printf("%s\t%s\t%llu\t%s\t%lf\n", (*p2)[pole_poz[i]], (*p3)[pole_poz[i]], p6[pole_poz[i]], (*p5)[pole_poz[i]], p4[pole_poz[i]]);
     }
   }
   return 0;
 }
 
-int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4, char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
 {
   int i, j;
-  char **pole_casy;
-  char hod[3], min[3], last_hod[3], last_min[3], pom[5];
+  char **pole_casy, hod[3], min[3], last_hod[3], last_min[3], pom[5];
 
-  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL)
+  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL && p6 == NULL)
   {
     printf("Polia nie su vytvorene.\n");
     return 0;
@@ -373,17 +354,13 @@ int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   return 0;
 }
 
-int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4, char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
 {
   char tmv[10];
-  int i = 0, j = 0, cntr = 0, pom = 0, cntr_hist = 0, min = 0, max = 5,
-      vel_pol = 0, pos = 0;
-  int pole_poz[100], *pocetnost;
+  int i = 0, j = 0, cntr = 0, pom = 0, cntr_hist = 0, min = 0, max = 5, vel_pol = 0, pos = 0, pole_poz[100], *pocetnost;
   double del;
 
-  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL)
+  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL && p6 == NULL)
   {
     printf("Polia nie su vytvorene.\n");
     return 0;
@@ -451,8 +428,7 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   return 0;
 }
 
-int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4, char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
 {
   FILE *fw;
   char mm[10], tmr[10];
@@ -462,8 +438,7 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 
   fw = fopen("vystup_S.txt", "w");
 
-  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL)
+  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL && p6 == NULL)
   {
     printf("Polia nie su vytvorene.\n");
     return 0;
@@ -490,7 +465,8 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 
   if (cntr == 0)
   {
-    printf("Pre dany vstup neexistuju zaznamy.");
+    printf("Pre dany vstup neexistuju zaznamy.\n");
+    return 0;
   }
 
   /*bubblesort pre datum a cas vzostupne*/
@@ -525,8 +501,7 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     }
     else
     {
-      fprintf(fw, "%llu%s\t%.7lf\n", p6[pole_poz[i]], (*p5)[pole_poz[i]],
-              merania[i]);
+      fprintf(fw, "%llu%s\t%.7lf\n", p6[pole_poz[i]], (*p5)[pole_poz[i]],merania[i]);
     }
   }
   return 0;
@@ -653,15 +628,13 @@ int c(FILE **fr)
   return 0;
 }
 
-int z(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
-      char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
+int z(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4, char ***p5, unsigned long long int *p6, unsigned int *zaznamy)
 {
   int i, j = 0, cntr = 0;
   unsigned long long int id;
   char pole_poz[57];
 
-  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
-      p6 == NULL)
+  if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL && p6 == NULL)
   {
     printf("Polia nie su vytvorene.\n");
     return 0;
@@ -712,19 +685,19 @@ int main()
     {
     case 'v':
       v(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
-      break; // funkcia na vypis zaznamov
+      break; 
     case 'o':
       o(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
-      break; // funkcia na vypis odmeny
+      break; 
     case 'n':
       n(&fr, &p1, &p2, &p3, &p4, &p5, &p6, &zaznamy);
-      break; // funkcia na vytvorenie dinamickeho pola
+      break; 
     case 'h':
       h(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
-      break; // vypise spz specialnym sposobom
+      break; 
     case 's':
       s(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
-      break; // vypise najcastejsie sa vyskitujuci sa znak a jeho pocetnost
+      break; 
     case 'r':
       r(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
       break;
@@ -742,8 +715,7 @@ int main()
     fclose(fr);
   }
 
-  if (p1 != NULL && p2 != NULL && p3 != NULL && p4 != NULL && p5 != NULL &&
-      p6 != NULL)
+  if (p1 != NULL && p2 != NULL && p3 != NULL && p4 != NULL && p5 != NULL && p6 != NULL)
   {
     dealokuj_polia(p1, &p2, &p3, p4, &p5, p6, &zaznamy);
   }
