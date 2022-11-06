@@ -27,10 +27,12 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   fseek(*fr, 0, SEEK_SET);
 
   if (p1 != NULL && *p2 != NULL && *p3 != NULL && p4 != NULL && *p5 != NULL &&
-      p6 != NULL)
+      p6 != NULL) /*ak polia su uz alokovane, vypise z poli*/
   {
     for (int i = 0; i < *zaznamy; i++)
     {
+      /*pri volani tejto funkcie po zavolani funkcie "z" nasledujuca podmienka vynecha vymazane zaznamy, je pouzita aj dalej pri funkciach kt.
+      vyuzivaju vytvorene dynamicke polia*/
       if (p1[i] == '\0' && (*p2)[i] == NULL && (*p3)[i] == NULL && p4[i] == '\0' && (*p5)[i] == NULL && p6[i] == '\0')
       {
         continue;
@@ -44,7 +46,7 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
       printf("\n");
     }
   }
-  else
+  else /*vypise priamo zo suboru*/
   {
     do
     {
@@ -63,7 +65,7 @@ int v(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 
 int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
                    double *p4, char ***p5, unsigned long long int *p6,
-                   unsigned int *zaznamy)
+                   unsigned int *zaznamy) /*funkcia pre dealokaciu poli, osetrene ak uz vo funkcii "z" niektore zaznamy boli prealokovane na NULL*/
 {
   int i;
 
@@ -72,13 +74,13 @@ int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
 
   for (i = 0; i < *zaznamy; i++)
   {
+    free((*p2)[i]);
     if ((*p2)[i] == NULL)
     {
       continue;
     }
     else
     {
-      free((*p2)[i]);
       (*p2)[i] = NULL;
     }
   }
@@ -87,13 +89,13 @@ int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
 
   for (i = 0; i < *zaznamy; i++)
   {
+    free((*p3)[i]);
     if ((*p3)[i] == NULL)
     {
       continue;
     }
     else
     {
-      free((*p3)[i]);
       (*p3)[i] = NULL;
     }
   }
@@ -105,11 +107,11 @@ int dealokuj_polia(unsigned long long int *p1, char ***p2, char ***p3,
 
   for (i = 0; i < *zaznamy; i++)
   {
+    free((*p5)[i]);
     if ((*p5)[i] == NULL)
     {
       continue;
     }
-    free((*p5)[i]);
     (*p5)[i] = NULL;
   }
   free(*p5);
@@ -146,16 +148,15 @@ int n(FILE **fr, unsigned long long int **p1, char ***p2, char ***p3,
   {
     dealokuj_polia(*p1, p2, p3, *p4, p5, *p6, zaznamy);
   }
-  while ((s = fscanf(*fr, "%s", arr)) != EOF)
-  { // skenuje bez prazdnych riadkov teda priamo dostanem len pocet
-    // riadkov so zaznamami
+  while ((s = fscanf(*fr, "%s", arr)) != EOF) /*skenuje bez prazdnych riadkov, teda priamo dostanem len pocet riadkov so zaznamami*/
+  { 
     if (s != '\n')
     {
       cntr++;
     }
   }
 
-  *zaznamy = cntr / 6; // pocet zaznamov, kazdy zaznam pozostava zo 6 udajov
+  *zaznamy = cntr / 6; /*pocet zaznamov, kazdy zaznam pozostava zo 6 udajov*/
 
   *p1 = (unsigned long long int *)malloc(*zaznamy * sizeof(unsigned long long int));
   *p2 = malloc(*zaznamy * sizeof(char *));
@@ -202,7 +203,7 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
       p6 == NULL)
   {
-    n(fr, &p1, p2, p3, &p4, p5, &p6, zaznamy);
+    n(fr, &p1, p2, p3, &p4, p5, &p6, zaznamy); /*ak este neboli polia alokovane, alokujem si ich a na konci dealokujem, kedze "n" stlacene nebolo*/
     scanf("%s %s", mm, tmr);
 
     for (i = 0; i < *zaznamy; i++)
@@ -215,13 +216,14 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
       {
         if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0)
         {
-          pole_poz[j] = i;
+          pole_poz[j] = i; /*do pomocneho pola si ulozim pozicie v dynam. poliach, na ktorych su udaje zhodne so vstupom od uzivatela*/
           j++;
           cntr++;
         }
       }
     }
 
+    /*na sortovanie pouzivam bubble sort*/
     for (i = 0; i < cntr - 1; i++)
     {
       for (j = 0; j < cntr - i - 1; j++)
@@ -229,7 +231,7 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
         if (((p6[pole_poz[j]] > p6[pole_poz[j + 1]]) &&
              (atoi((*p5)[pole_poz[j]]) <= atoi((*p5)[pole_poz[j + 1]]))) ||
             ((p6[pole_poz[j]] == p6[pole_poz[j + 1]]) &&
-             (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]]))))
+             (atoi((*p5)[pole_poz[j]]) > atoi((*p5)[pole_poz[j + 1]])))) /*podmienky aby sortovalo aj podla datumu aj podla casu*/
         {
           pom = pole_poz[j + 1];
           pole_poz[j + 1] = pole_poz[j];
@@ -245,7 +247,7 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     }
     dealokuj_polia(p1, p2, p3, p4, p5, p6, zaznamy);
   }
-  else
+  else /*rovnaky algoritmus, len pripad kde n uz bolo stlacene*/
   {
     scanf("%s %s", mm, tmr);
 
@@ -288,6 +290,7 @@ int o(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
              p6[pole_poz[i]], (*p5)[pole_poz[i]], p4[pole_poz[i]]);
     }
   }
+  return 0;
 }
 
 int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
@@ -303,7 +306,7 @@ int r(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     printf("Polia nie su vytvorene.\n");
     return 0;
   }
-  pole_casy = malloc((*zaznamy) * sizeof(char *));
+  pole_casy = malloc((*zaznamy) * sizeof(char *)); /*vytvorim si pomocne pole, v ktorom si povodne pole s casmi zoradim vzostupne cez bubblesort*/
 
   for (i = 0; i < *zaznamy; i++)
   {
@@ -376,7 +379,7 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   char tmv[10];
   int i = 0, j = 0, cntr = 0, pom = 0, cntr_hist = 0, min = 0, max = 5,
       vel_pol = 0, pos = 0;
-  int pole_poz[10000], *pocetnost;
+  int pole_poz[100], *pocetnost;
   double del;
 
   if (p1 == NULL && *p2 == NULL && *p3 == NULL && p4 == NULL && *p5 == NULL &&
@@ -398,13 +401,14 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     {
       if (strcmp(((*p3)[i]), tmv) == 0)
       {
-        pole_poz[j] = i;
+        pole_poz[j] = i; /*pomocne pole s poziciami v dynam. poliach kde sa udaje zhoduju so vstupom*/
         j++;
         cntr++;
       }
     }
   }
 
+  /*usporiadam si pole pozicii podla toho ako idu hodnoty v povodnom poli vzostupne cez bubblesort*/
   for (i = 0; i < cntr - 1; i++)
   {
     for (j = 0; j < cntr - i - 1; j++)
@@ -418,9 +422,9 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     }
   }
 
-  vel_pol = ceil((p4[pole_poz[cntr - 1]]) / 5);
+  vel_pol = ceil((p4[pole_poz[cntr - 1]]) / 5); /*zistim si pocet intervalov; najvacsiu hodnotu vydelim 5 a zaokruhlim nahor pomocou funkcie ceil*/
 
-  pocetnost = (int *)malloc(vel_pol * sizeof(int));
+  pocetnost = (int *)malloc(vel_pol * sizeof(int)); /*alokujem si pole kde budem ukladat pocetnost pre dane intervaly*/
   for (i = 0; i < vel_pol; i++)
   {
     pocetnost[i] = 0;
@@ -428,9 +432,9 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
 
   for (i = 0; i < cntr; i++)
   {
-    del = floor(p4[pole_poz[i]] / 5);
+    del = floor(p4[pole_poz[i]] / 5); /*hodnotu pre typ meranej veliciny zhodnej so vstupom vydelim 5 a zaokruhlim nadol, cim zistim do ktoreho intervalu patri*/
     pos = (int)del;
-    pocetnost[pos] = pocetnost[pos] + 1;
+    pocetnost[pos] = pocetnost[pos] + 1; /*do pola ukladam pocet hodnot v intervaloch*/
   }
 
   printf("\t%s\t\tpocetnost\n", tmv);
@@ -444,6 +448,7 @@ int h(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     min = max;
     max += 5;
   }
+  return 0;
 }
 
 int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
@@ -476,7 +481,7 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     {
       if (strcmp(((*p2)[i]), mm) == 0 && strcmp(((*p3)[i]), tmr) == 0)
       {
-        pole_poz[j] = i;
+        pole_poz[j] = i; /*pomocne pole s poziciami v dynam. poliach kde sa udaje zhoduju so vstupom*/
         j++;
         cntr++;
       }
@@ -488,6 +493,7 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     printf("Pre dany vstup neexistuju zaznamy.");
   }
 
+  /*bubblesort pre datum a cas vzostupne*/
   for (i = 0; i < cntr - 1; i++)
   {
     for (j = 0; j < cntr - i - 1; j++)
@@ -507,12 +513,12 @@ int s(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   merania = (double *)malloc(cntr * sizeof(double));
   for (i = 0; i < cntr; i++)
   {
-    merania[i] = p4[pole_poz[i]];
+    merania[i] = p4[pole_poz[i]]; /*nove pole s nameranymi hodnotami zoradenymi podla datumu a casu vzostupne*/
   }
 
   for (i = 0; i <= cntr; i++)
   {
-    if (i == cntr)
+    if (i == cntr) /*v poslednom kroku vypise vetu a zavrie subor*/
     {
       printf("Pre dany vstup je vytvoreny txt subor.\n");
       fclose(fw);
@@ -590,23 +596,23 @@ int c(FILE **fr)
 
     if (strlen(datum) != 8)
     {
-      printf("Nekorektne zadany vstup: Cas.\n");
+      printf("Nekorektne zadany vstup: Datum.\n");
       spravnost++;
     }
     else
     {
       strncpy(mesiac, &datum[4], 6 - 4);
-      mesiac[2] = '\0';
+      mesiac[2] = '\0'; /*kedze kopirujem zo stredu stringu musim este vlozit znak '\0'*/
       strncpy(den, datum + 6, 2);
     }
     if (atoi(mesiac) > 12)
     {
-      printf("Nekorektne zadany vstup: Cas.\n");
+      printf("Nekorektne zadany vstup: Datum.\n");
       spravnost++;
     }
     else
     {
-      for (i = 0; i < 7; i++)
+    for (i = 0; i < 7; i++) /*osetrenie pre mesiace kt. maju max 31 dni*/
       {
         if (strcmp(mesiace31[i], mesiac) == 0)
         {
@@ -617,7 +623,7 @@ int c(FILE **fr)
           }
         }
       }
-      for (i = 0; i < 4; i++)
+      for (i = 0; i < 4; i++) /*osetrenie pre mesiace kt. maju max 30 dni*/
       {
         if (strcmp(mesiace30[i], mesiac) == 0)
         {
@@ -628,7 +634,7 @@ int c(FILE **fr)
           }
         }
       }
-      if (atoi(mesiac) == 2)
+      if (atoi(mesiac) == 2) /*osetrenie mesiaca februar*/
       {
         if (atoi(den) > 28)
         {
@@ -666,7 +672,7 @@ int z(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   {
     if (p1[i] == id)
     {
-      pole_poz[j] = i;
+      pole_poz[j] = i; /*pomocne pole s poziciami v dynam. poliach kde sa udaje zhoduju so vstupom*/
       j++;
       cntr++;
     }
@@ -675,7 +681,7 @@ int z(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
   {
     for (j = 0; j < cntr; j++)
     {
-      if (i == pole_poz[j])
+      if (i == pole_poz[j]) /*vymazanie zaznamov pre dany vstup, tieto zaznamy uz program v dalsich funkciach po zavolani tejto bude ignorovat*/
       {
         p1[i] = '\0';
         (*p2)[i] = NULL;
@@ -687,6 +693,7 @@ int z(FILE **fr, unsigned long long int *p1, char ***p2, char ***p3, double *p4,
     }
   }
   printf("Vymazalo sa : %d zaznamov !\n", cntr);
+  return 0;
 }
 
 int main()
@@ -696,12 +703,12 @@ int main()
   char **p2 = NULL, **p3 = NULL, **p5 = NULL;
   double *p4 = NULL;
   unsigned int zaznamy;
-  char pismeno;
+  char vstup;
 
   do
   {
-    scanf("%c", &pismeno);
-    switch (pismeno)
+    scanf("%c", &vstup);
+    switch (vstup)
     {
     case 'v':
       v(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
@@ -728,8 +735,8 @@ int main()
       z(&fr, p1, &p2, &p3, p4, &p5, p6, &zaznamy);
       break;
     }
-  } while (pismeno != 'k');
-
+  } while (vstup != 'k');
+  /*funkcia k:*/
   if (fr != NULL)
   {
     fclose(fr);
